@@ -9,6 +9,7 @@
 #define DISPLAYON   0x03 //Display on cursor off blink off
 #define BLINKYON    0x0F //Display on cursor on  blink on
 #define FUNCTIONSET 0xC3 //Sets to 8bit, and two line display
+#define BLANK       "                                                                              "
 
 void screenwrite (uint8_t rs,uint8_t rw,uint8_t data, uint8_t screen);
 

@@ -1,6 +1,35 @@
 #include "main.h"
 
-#define PLAN_C 1                       //Activate Plan C Mode
+/*------------------------
+Architecture changes
+->Init
+->Read switches
+->Confirm on screen
+->Driver input to confirm
+->while(1)
+Done as of 10/15/2016
+---------------------------*/
+/*--------------------------
+Pinout:
+BLDC                    PC15
+PLAN_C                  PC13
+IC                      PE5
+I2C Data (throttle)     PB7
+I2C Clock (throttle)    PB6
+Tach                    PB1
+Engine RPM              PA3
+Throttle                PB0
+Motor Enable            PC2
+Confirmation Button     PC7
+Extra_4                 PC3
+Extra_1 (I2C)           PB10
+Extra_2 (I2C)           PB11
+--------------------------*/
+
+#define IC 1
+#define BLDC 2
+#define PLAN_C 3
+
 #define I2CDELAY 200  //Dont set below 100
 
 #define I2C_UPDATE_MAX_SPEED 1 //Each tick is approximately 0.6 ms, so 200 is approximately 100 ms
@@ -119,13 +148,13 @@ void init_InputGPIO(void){
   //Initialze GPIO Structure
   GPIO_InitTypeDef  GPIO_InitStruct;
   
-//GPIOA pin PA0 - Motor Enable
-  GPIO_InitStruct.GPIO_Pin = GPIO_Pin_0;
+//GPIOA pin PC2 - Motor Enable
+  GPIO_InitStruct.GPIO_Pin = GPIO_Pin_2;
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
   GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
-  GPIO_Init(GPIOA, &GPIO_InitStruct);
+  GPIO_Init(GPIOC, &GPIO_InitStruct);
   
   //GPIOB pin PB1 - Tachometer Reading
   GPIO_InitStruct.GPIO_Pin = GPIO_Pin_1;
@@ -194,17 +223,102 @@ void init_InputGPIO(void){
 }
 
 int main(void){
-  TIM4->CCR1 = 0;
-  TIM4->CNT = 0x0;
-  GPIOB->ODR = GPIOB->ODR&!(0x01<<6);
+  uint8_t MotorEnabled = 0x00;  //Is motor enabled pressed?
+  uint16_t threshold = 10;      //Debounce threshold
+  uint32_t count = 0;           //Debounce Counter
+  
+  //Currently 7 bits of 0 + motor enable
+  uint8_t enable = 0;           //Debounce motor enable
+  
+  uint8_t status = 0;           //Status byte. LSb is enable
+  
+  uint8_t brake = 0;
+  
+  //Bit 0 = echo enable
+  //Bit 1 = fault pin
+  //Bits 2-7 = 0
+  uint8_t mcspeed = 0;          //Motor controller speed in rev/s
+  uint8_t mcstatus = 0;         //Motor controller status
+  
+  uint16_t updatecount = 0;
+  
+  uint8_t LEDCount = 0;
+
+  uint8_t MotorType = 0;
+  uint8_t MotorConfirm = 0;
+  uint8_t BlinkCounter = 0;
+    
   TIM_OCInitTypeDef TIM_OCStruct;
+
+   //Busy LEDs
   STM_EVAL_LEDInit(LED4);
   STM_EVAL_LEDOn(LED4);
   STM_EVAL_LEDInit(LED5);
+ 
+  Delay(0xFFFFF); //Gives the screen time to wake up before we initialize it
+  STM_EVAL_LEDOn(LED5);
+  STM_EVAL_LEDOff(LED4); 
   
   
+  init_InputGPIO();             //Initialize Inputs: Motor Enable, Tach, Brake Lights
+  init_Throttle();              //Initialize Throttle
+  init_screen();                //Initialize Screen
+  init_tach();                  //Initialize Tachometer
+  //init_brakes();                //Initialize Brake detection
+  init_watchdog();              //Initialize Watchdog
+  //init_I2C_Timeout();         //TODO: come back
+  init_ElapsedTime();
   
-  if (!PLAN_C) {
+  // PWM init to 0
+  TIM4->CCR1 = 0;
+  TIM4->CNT = 0x0;
+  GPIOB->ODR = GPIOB->ODR&!(0x01<<6);
+   
+  //Read mode switches
+  if (GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_5)){
+    MotorType = IC;
+  }
+  else if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_15)){
+    MotorType = BLDC;
+  }
+  else if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_13)){
+    MotorType = PLAN_C;
+  }
+  else{
+    MotorType = 0;
+    stringtoscreen("Shits fucked yo", UPPERSCREEN); //TODO: COME BACK FOR ME!!!
+    while(1){}
+  }
+  
+  //Screen Confirmation 
+  while(MotorConfirm != 1){
+    MotorConfirm = GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_7);
+    
+    if(BlinkCounter == 0){
+      stringtoscreen("Confirm MODE", UPPERSCREEN);
+      if(MotorType == BLDC){
+        stringtoscreen("BLDC MODE", LOWERSCREEN);  
+      }
+      else if(MotorType == PLAN_C){
+        stringtoscreen("PLAN_C MODE", LOWERSCREEN);
+      }
+      else if(MotorType == IC){
+        stringtoscreen("IC ENGINE MODE", LOWERSCREEN);
+      }
+    }
+    else if(BlinkCounter == 10000){
+      stringtoscreen(BLANK, UPPERSCREEN);
+      stringtoscreen(BLANK, LOWERSCREEN);
+    }
+    
+    BlinkCounter++;
+    
+    if(BlinkCounter == 20000){
+      BlinkCounter=0;
+    }
+  }
+  
+  if (MotorType == BLDC) {
     init_I2C1();                //Initialize I2C
     
     TIM_OCStruct.TIM_OCMode = TIM_OCMode_PWM2;
@@ -215,51 +329,9 @@ int main(void){
     TM_TIMER_Init();                 //Initialize PWM output for brushed motor on PB6
     TM_PWM_Init();
   }
-  
-  
-  
-  Delay(0xFFFFF); //Gives the screen time to wake up before we initialize it
-  STM_EVAL_LEDOn(LED5);
-  STM_EVAL_LEDOff(LED4);
-  
-  //SystemInit();
-  
-  init_InputGPIO();             //Initialize Inputs: Motor Enable, Tach, Brake Lights
-  init_Throttle();              //Initialize Throttle
-  init_screen();                //Initialize Screen
-  init_tach();                  //Initialize Tachometer
-  init_brakes();                //Initialize Brake detection
-  init_watchdog();              //Initialize Watchdog
-  //init_I2C_Timeout();
-  init_ElapsedTime();
-  
-  uint8_t MotorEnabled = 0x00;  //Is motor enabled pressed?
-  uint16_t threshold = 10;      //Debounce threshold
-  uint32_t count = 0;           //Debounce Counter
-  
-  uint8_t enable = 0;           //Debounce motor enable
-  //Currently 7 bits of 0 + motor enable
-  uint8_t status = 0;           //Status byte. LSb is enable
-  
-  uint8_t brake = 0;
-  
-  
-  uint8_t mcspeed = 0;          //Motor controller speed in rev/s
-  uint8_t mcstatus = 0;         //Motor controller status
-  //Bit 0 = echo enable
-  //Bit 1 = fault pin
-  //Bits 2-7 = 0
-  
-  uint16_t updatecount = 0;
-  
-  uint8_t LEDCount = 0;
-  
+    
   TIM4->CCR1 = 0;
   TIM4->CNT = 0xff;
-  
-  //stringtoscreen("SSE 2016 Heads Up Display System This is junk text to make it longer ~",UPPERSCREEN);
-  //stringtoscreen(itos(88), LOWERSCREEN);
-  
   
   while (1){
     
