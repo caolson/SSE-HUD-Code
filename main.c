@@ -18,6 +18,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/*------------------------
+Architecture changes
+->Init
+->Read switches
+->Confirm on screen
+->Driver input to confirm
+->while(1)
+
+---------------------------*/
+/*--------------------------
+Pinout:
+
+BLDC                    PC15
+PLAN_C                  PC13
+IC                      PE5
+I2C Data (throttle)     PB7
+I2C Clock (throttle)    PB6
+Tach                    PB1
+Engine RPM              PA3
+Throttle                PB0
+Motor Enable            PA0
+
+Extra_4                 PC3
+Extra_1 (I2C)           PB10
+Extra_2 (I2C)           PB11
+--------------------------*/
+
 
 #define PLAN_C 1                        //Activate Plan C Mode
 
