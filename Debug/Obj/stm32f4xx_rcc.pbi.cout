@@ -1,4 +1,4 @@
-"C:\Users\Carl\Documents\HUD Code\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_rcc.c"
+"C:\Users\vaugh_000\Documents\GitHub\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_rcc.c"
 -std=c99
 -ferror-limit=100
 -I
@@ -18,9 +18,9 @@ C:\Users\Carl\Documents\HUD Code\Utilities\STM32F4-Discovery
 -I
 C:\Users\Carl\Documents\HUD Code\Project
 -I
-C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2\arm\inc
+D:\School Programs\arm\inc
 -I
-C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2\arm\inc\c
+D:\School Programs\arm\inc\c
 -I
 C:\Users\Carl\Documents\HUD Code
 -I
@@ -277,8 +277,8 @@ C:\Users\Carl\Documents\HUD Code\Project
 -D__EDG_SYSV=0
 -D__EDG_ANSIC=1
 -D__EDG_CPP11_IL_EXTENSIONS_SUPPORTED=1
--D_DLIB_CONFIG_FILE_HEADER_NAME="C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2\arm\INC\c\DLib_Config_Normal.h"
--D_DLIB_CONFIG_FILE_STRING="C:\\Program Files (x86)\\IAR Systems\\Embedded Workbench 7.2\\arm\\INC\\c\\DLib_Config_Normal.h"
+-D_DLIB_CONFIG_FILE_HEADER_NAME="D:\School Programs\arm\INC\c\DLib_Config_Normal.h"
+-D_DLIB_CONFIG_FILE_STRING="D:\\School Programs\\arm\\INC\\c\\DLib_Config_Normal.h"
 -D__VERSION__="IAR ANSI C/C++ Compiler V7.40.7.9843/W32 for ARM"
 -D__CODE_MEMORY_LIST1__()=__CODE_MEM_HELPER1__(__code, 0 )
 -D__CODE_MEMORY_LIST2__(_P1)=__CODE_MEM_HELPER2__(__code, 0 ,  _P1 )

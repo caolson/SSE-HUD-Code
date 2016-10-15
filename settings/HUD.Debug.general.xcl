@@ -1,14 +1,14 @@
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2\arm\bin\armproc.dll" 
+"D:\School Programs\arm\bin\armproc.dll" 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2\arm\bin\armstlink2.dll" 
+"D:\School Programs\arm\bin\armstlink2.dll" 
 
-"C:\Users\Carl\Documents\HUD Code\SSE-HUD-Code\Debug\Exe\HUD.out" 
+"C:\Users\vaugh_000\Documents\GitHub\SSE-HUD-Code\Debug\Exe\HUD.out" 
 
---plugin "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2\arm\bin\armbat.dll" 
+--plugin "D:\School Programs\arm\bin\armbat.dll" 
 
---device_macro "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2\arm\config\debugger\ST\STM32F4xx.dmac" 
+--device_macro "D:\School Programs\arm\config\debugger\ST\STM32F4xx.dmac" 
 
---flash_loader "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2\arm\config\flashloader\ST\FlashSTM32F4xxx.board" 
+--flash_loader "D:\School Programs\arm\config\flashloader\ST\FlashSTM32F4xxx.board" 
 
 
 

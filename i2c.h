@@ -9,6 +9,8 @@
 #define SLAVE_ADDRESS 0x0F              //The slave address
 #define I2C_ADDRESS 0x42                //My address
 
+extern volatile uint8_t I2CTimedOut;
+
 void init_I2C1(void);
 void I2C_start(I2C_TypeDef* I2Cx, uint8_t address, uint8_t direction);
 void I2C_write(I2C_TypeDef* I2Cx, uint8_t data);

@@ -2202,6 +2202,12 @@
   <group>
     <name>user</name>
     <file>
+      <name>$PROJ_DIR$\brake.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\brake.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\i2c.c</name>
     </file>
     <file>
@@ -2227,6 +2233,18 @@
     </file>
     <file>
       <name>$PROJ_DIR$\stm32f4xx_it.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\tach.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\tach.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\throttle.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\throttle.h</name>
     </file>
   </group>
   <file>

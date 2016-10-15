@@ -61,17 +61,17 @@ void I2C_start(I2C_TypeDef* I2Cx, uint8_t address, uint8_t direction){
     * direction
   */ 
   if(direction == I2C_Direction_Transmitter){
-          while(!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED));
+          while(!(I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED) || I2CTimedOut));
   }
   else if(direction == I2C_Direction_Receiver){
-	while(!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED));
+	while(!(I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED)  || I2CTimedOut));
   }
 }
 
 void I2C_write(I2C_TypeDef* I2Cx, uint8_t data){
 	I2C_SendData(I2Cx, data);
 	// wait for I2C1 EV8_2 --> byte has been transmitted
-	while(!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_BYTE_TRANSMITTED));
+	while(!(I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_BYTE_TRANSMITTED)  || I2CTimedOut));
 }
 
 void I2C_stop(I2C_TypeDef* I2Cx){
@@ -86,7 +86,7 @@ uint8_t I2C_read_nack(I2C_TypeDef* I2Cx){
 	I2C_AcknowledgeConfig(I2Cx, DISABLE);
 	I2C_GenerateSTOP(I2Cx, ENABLE);
 	// wait until one byte has been received
-	while( !I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_BYTE_RECEIVED) );
+	while( !(I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_BYTE_RECEIVED)  || I2CTimedOut));
 	// read data from I2C data register and return data byte
 	uint8_t data = I2C_ReceiveData(I2Cx);
 	return data;
@@ -96,7 +96,7 @@ uint8_t I2C_read_ack(I2C_TypeDef* I2Cx){
 	// enable acknowledge of recieved data
 	I2C_AcknowledgeConfig(I2Cx, ENABLE);
 	// wait until one byte has been received
-	while( !I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_BYTE_RECEIVED) );
+	while( !(I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_BYTE_RECEIVED)  || I2CTimedOut) );
 	// read data from I2C data register and return data byte
 	uint8_t data = I2C_ReceiveData(I2Cx);
 	return data;

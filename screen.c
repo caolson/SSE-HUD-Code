@@ -15,6 +15,8 @@ uint8_t lowerloc = 0;
 uint8_t upperend = 0;
 uint8_t lowerend = 0;
 
+//The Char map bits are flipped on the datasheet
+//Ascii table with correct corresponding characters
 uint8_t charmap[256] = { 
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -33,7 +35,9 @@ uint8_t charmap[256] = {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
-  
+
+//Write to screen initialization
+//Configure pins PA 1,2,6,7 , PE 10,11,12,13 , and PB 12,13,14,15 for output
 void screenmodewrite () {
 
    //Initialze GPIO Structure
@@ -63,6 +67,8 @@ void screenmodewrite () {
   
 }
 
+//Read from screen initialization
+//Configure pins PA 1,2,6,7 , PE 10,11,12,13 , and PB 12,13,14,15 for input
 void screenmoderead() {
 
    //Initialze GPIO Structure
@@ -85,6 +91,7 @@ void screenmoderead() {
   
 }
 
+//Turns on screen, enables blinking and cursor, clears screen
 void init_screen(){
   /* Screen pin assignment:
   PA1: ENABLE UPPER
@@ -101,24 +108,26 @@ void init_screen(){
   PB15: DH3
   */
   
-  screenwrite(0,0,0xCF,UPPERSCREEN); //00110000 11000000
+  screenwrite(0,0,FUNCTIONSET,UPPERSCREEN); //00110000 11000000        //Turns on screen top rows
   Delay(10);
-  screenwrite(0,0,0x0F,UPPERSCREEN); //00001111 00001111
+  screenwrite(0,0,DISPLAYON,UPPERSCREEN); //00001111 00001111        //Enables cursor and blinking on top rows
   Delay(10);
-  screenwrite(0,0,CLEARSCREEN,UPPERSCREEN); //00001000 00000001
+  screenwrite(0,0,CLEARSCREEN,UPPERSCREEN); //00001000 00000001 //Clears top rows
   Delay(10);
   
-  screenwrite(0,0,0xCF,LOWERSCREEN);
+  screenwrite(0,0,FUNCTIONSET,LOWERSCREEN);                            //Turns on screen bottom rows
   Delay(10);
-  screenwrite(0,0,0x0F,LOWERSCREEN);
+  screenwrite(0,0,DISPLAYON,LOWERSCREEN);                            //Enables cursor and blinking on bottom rows
   Delay(10);
-  screenwrite(0,0,CLEARSCREEN,LOWERSCREEN);
+  screenwrite(0,0,CLEARSCREEN,LOWERSCREEN);                     //Clears bottom rows
   Delay(10);
   
 }
 
+//Converts message to be written to screen
 void stringtoscreen (char * str, uint8_t screen){ // string
   uint8_t i = 0;
+  // Creates strings for upper and lower screens
   while(str[i] > 0 && i < 80) {
     if (screen == UPPERSCREEN) {
       upperscreen[i] = charmap[str[i]];
@@ -128,6 +137,7 @@ void stringtoscreen (char * str, uint8_t screen){ // string
     }
     i++;
   }
+  //Passes where to write and to update the screen
   if (screen == UPPERSCREEN) {
     upperloc = 0;
     upperend = i;
@@ -138,23 +148,22 @@ void stringtoscreen (char * str, uint8_t screen){ // string
     lowerend = i;
     lowerupdate = 1;
   }
-  
-  screenwrite(0,0,CLEARSCREEN,screen);
+  //Clears screen
+  screenwrite(0,0,RETURNHOME,screen);
 }
 
+//Write command to screen
 void screenwrite (uint8_t rs,uint8_t rw,uint8_t data, uint8_t screen){
  
   screenmodewrite();
   
-  //Enable Write  
+  //Set rs to 1 and rw to 0
   if (rs){
     GPIO_SetBits(GPIOA,GPIO_Pin_7);
-
   }
   else{
     GPIO_ResetBits(GPIOA,GPIO_Pin_7);
   }
-  //Enable Write
   if (rw){
     GPIO_SetBits(GPIOA,GPIO_Pin_6);
   }
@@ -162,7 +171,7 @@ void screenwrite (uint8_t rs,uint8_t rw,uint8_t data, uint8_t screen){
     GPIO_ResetBits(GPIOA,GPIO_Pin_6);
   }
   
-  Delay(50);
+  Delay(1000);
   
   //Upper Lower Write Select 
   //Screen 1 = Upper 
@@ -174,8 +183,9 @@ void screenwrite (uint8_t rs,uint8_t rw,uint8_t data, uint8_t screen){
     GPIO_SetBits(GPIOA,GPIO_Pin_2);
   }
   
-  Delay(50);
+  Delay(1000);
   
+  //Setting data to correct pin
   if (data & 1){
     GPIO_SetBits(GPIOE,GPIO_Pin_10);
   }
@@ -233,34 +243,38 @@ void screenwrite (uint8_t rs,uint8_t rw,uint8_t data, uint8_t screen){
   }
 
   
-  Delay(250);
+  Delay(2000);
+  //resets the upper lower write select
+  GPIO_ResetBits(GPIOA,GPIO_Pin_1|GPIO_Pin_2);
   
-    GPIO_ResetBits(GPIOA,GPIO_Pin_1|GPIO_Pin_2);
-Delay(250);
-  
+  Delay(2000);
+  //resets the enable write
   GPIO_ResetBits(GPIOA,GPIO_Pin_6|GPIO_Pin_7);
   
   
-  Delay(50);
+  Delay(1000);
+  //Resets data pins
   GPIO_ResetBits(GPIOE,GPIO_Pin_10|GPIO_Pin_11|GPIO_Pin_12|GPIO_Pin_13);
-  
   GPIO_ResetBits(GPIOB,GPIO_Pin_12|GPIO_Pin_13|GPIO_Pin_14|GPIO_Pin_15);
   
-  Delay(1000);
+  Delay(4000);
   
   
 }
 
+//Read command to screen
 uint8_t screenread (uint8_t rs, uint8_t rw, uint8_t screen){
+  //Configures pins to inputs
   screenmoderead();
   
+  //Set rs to 0 and rw to 1
   if (rs){
     GPIO_SetBits(GPIOA,GPIO_Pin_7);
   }
   else{
     GPIO_ResetBits(GPIOA,GPIO_Pin_7);
   }
-  //Enable Write
+  
   if (rw){
     GPIO_SetBits(GPIOA,GPIO_Pin_6);
   }
@@ -268,9 +282,9 @@ uint8_t screenread (uint8_t rs, uint8_t rw, uint8_t screen){
     GPIO_ResetBits(GPIOA,GPIO_Pin_6);
   }
   
-  Delay(5);
+  Delay(500);
   
-  //Upper Lower Write Select 
+  //Upper Lower Select 
   //Screen 1 = Upper 
   //Screen 0 = Lower
   if (screen == UPPERSCREEN){
@@ -280,8 +294,8 @@ uint8_t screenread (uint8_t rs, uint8_t rw, uint8_t screen){
     GPIO_SetBits(GPIOA,GPIO_Pin_2);
   }
   
-  Delay(10);
-  
+  Delay(1000);
+  //Reads data from screen and stores to data
   uint8_t data = 0;
   data += (GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_10)<<0);
   data += (GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_11)<<1);
@@ -292,6 +306,7 @@ uint8_t screenread (uint8_t rs, uint8_t rw, uint8_t screen){
   data += (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_14)<<6);
   data += (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_15)<<7);
   
+  //resets upper lower select, rs, and rw
   GPIO_ResetBits(GPIOA,GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_6|GPIO_Pin_7);
   
   return data;
@@ -324,4 +339,26 @@ void screenupdate (){
      //}
    }
 }
+
+/* Special concat written for 40 character screen. buffer must be 80 characters long */
+char* concat(char* buffer, char* str1, char* str2){
+  uint8_t i;
+  for (i = 0; i < 80; i++){
+   if(i < 40){
+      if(str1[i] == 0){
+        buffer[i] = ' ';
+      }
+      else{
+        buffer[i] = str1[i];
+      } 
+    }
+    else{
+      buffer[i] = str2[i-40];
+    }
+  }
+  
+  buffer[79] = 0;
+  return buffer;
+}
+
 
