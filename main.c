@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 #define PLAN_C 1                        //Activate Plan C Mode
 
 #define THROTTLE_MAX 50 //Throttle is limited to this value
@@ -235,6 +236,7 @@ void TM_TIMER_Init(void) {
     To get your frequency for PWM, equation is simple
     
     PWM_frequency = timer_tick_frequency / (TIM_Period + 1)
+    
     
     If you know your PWM frequency you want to have timer period set correct
     
