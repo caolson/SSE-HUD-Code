@@ -47,43 +47,11 @@ extern volatile uint8_t I2CTimedOut = 0;
 extern volatile uint32_t revolutions;
 
 char* itos(char str[11], uint32_t value);
-char* insertString(char* buffer, char* str, uint8_t pos);
-
-void init_I2C_Timeout() {
-
-  NVIC_InitTypeDef      NVIC_InitStructure;
-  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-  
-  /* TIM5 clock enable */
-  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);
-  
-  /* Compute the prescaler value */
-  uint16_t PrescalerValue = (uint16_t) 71; //Standard Clock Divider of 71 Results in 1 MHz clock
-  
-  /* Time base configuration */
-  TIM_TimeBaseStructure.TIM_Period = 1500; //CHANGE ME TO CHANGE I2C TIMEOUT. 750 IS OK, BUT KINDA SLOW
-  TIM_TimeBaseStructure.TIM_Prescaler = PrescalerValue;
-  TIM_TimeBaseStructure.TIM_ClockDivision = 0;
-  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-  
-  TIM_TimeBaseInit(TIM5, &TIM_TimeBaseStructure);
-  
-  TIM_ITConfig(TIM5, TIM_IT_Update, ENABLE);
-  
-  NVIC_InitStructure.NVIC_IRQChannel = TIM5_IRQn ;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure); 
-  
-  /* TIM5 enable counter */
-  TIM_Cmd(TIM5, DISABLE);
-  TIM5->CNT = 0;
-} 
+char* insertString(char* buffer, char* str, uint8_t pos); 
 
 extern volatile uint32_t elapsed = 0;
 
-void init_ElapsedTime() {
+void init_ElapsedTime() { // used by the screen
 
   NVIC_InitTypeDef      NVIC_InitStructure;
   TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
@@ -114,7 +82,7 @@ void init_ElapsedTime() {
   TIM_Cmd(TIM3, ENABLE);
 } 
 
-void TIM3_IRQHandler(void) {
+void TIM3_IRQHandler(void) { // used by the screen
   TIM_ClearFlag(TIM3, TIM_FLAG_Update);
   elapsed++;
 }
@@ -286,7 +254,7 @@ int main(void){
   }
   else{
     MotorType = 0;
-    stringtoscreen("Shits fucked yo", UPPERSCREEN); //TODO: COME BACK FOR ME!!!
+    stringtoscreen("STOP A BAD THING HAS HAPPENED!!!", UPPERSCREEN); //TODO: COME BACK FOR ME!!!
     while(1){}
   }
   
@@ -388,12 +356,10 @@ int main(void){
       
       insertString(str4, itos(buf, revolutions*(TIRE_DIAMETER*3.1415)/12), 25);
       concat(stru, str3, str4);
-      
-      //sprintf(str2, "%3.1f   %3.1f   %2d     %2d", speedMPH, averageSpeed, currentThrottle, mcspeed);
                                
       stringtoscreen(strl, LOWERSCREEN);                           //Printing to screen
       stringtoscreen(stru, UPPERSCREEN);
-      updatecount = 0;                                            //Reset update time
+      updatecount = 0;                                             //Reset update time
     }
     updatecount++;
     
@@ -435,25 +401,19 @@ int main(void){
       I2C_write(I2C1, currentThrottle);
       I2C_stop(I2C1);
       
-      //    I2C_start(I2C1, SLAVE_ADDRESS<<1, I2C_Direction_Transmitter); // start a transmission in Master transmitter mode
-      //    I2C_write(I2C1, 0x02);
-      //    //Send the status byte
-      //    I2C_write(I2C1, status);
-      //    I2C_stop(I2C1); // stop the transmission
-      //   
-      //    
       I2C_start(I2C1, SLAVE_ADDRESS<<1, I2C_Direction_Transmitter); // start a transmission in Master transmitter mode
       I2C_write(I2C1, 0x01);
       I2C_stop(I2C1);
-      //    
-      //    //Read data from motor controller via I2C
+       
+      //Read data from motor controller via I2C
       I2C_start(I2C1, SLAVE_ADDRESS<<1, I2C_Direction_Receiver);    // start a transmission in Master receiver mode
-      //    //Read Speed Byte
+      //Read Speed Byte
       mcspeed = I2C_read_nack(I2C1);
       I2C_stop(I2C1);
-      //    //Read Status Byte
+      
+      //Read Status Byte
       //    mcstatus = I2C_read_nack(I2C1); // read one byte and don't request another byte, stop transmission
-      //    //Deal with this information
+      //Deal with this information
       //}
       
       //TIM_Cmd(TIM5, DISABLE);
@@ -480,8 +440,6 @@ char* itos(char str[11], uint32_t value) {
   
   return str;
 }
-
-
 
 /* A special purpose method for assembling output for a 40 character display
 	Buffer must be a string of length 40

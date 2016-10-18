@@ -2,6 +2,21 @@
 #include "stm32f4_discovery.h" 
 #include "screen.h"
 
+/* Screen pin assignment:
+  PA1: ENABLE UPPER
+  PA2: ENABLE LOWER
+  PA6: R/W SIGNAL
+  PA7: R/S SIGNAL
+  PE10: DL0
+  PE11: DL1
+  PE12: DL2
+  PE13: DL3
+  PB12: DH0
+  PB13: DH1
+  PB14: DH2
+  PB15: DH3
+  */
+  
 
 uint8_t upperscreen [80];
 uint8_t lowerscreen [80];
@@ -91,35 +106,22 @@ void screenmoderead() {
   
 }
 
-//Turns on screen, enables blinking and cursor, clears screen
+//Turns on and clears screen
 void init_screen(){
-  /* Screen pin assignment:
-  PA1: ENABLE UPPER
-  PA2: ENABLE LOWER
-  PA6: R/W SIGNAL
-  PA7: R/S SIGNAL
-  PE10: DL0
-  PE11: DL1
-  PE12: DL2
-  PE13: DL3
-  PB12: DH0
-  PB13: DH1
-  PB14: DH2
-  PB15: DH3
-  */
   
-  screenwrite(0,0,FUNCTIONSET,UPPERSCREEN); //00110000 11000000        //Turns on screen top rows
+  //See Header for screen command definitions
+  screenwrite(0,0,FUNCTIONSET,UPPERSCREEN);  
   Delay(10);
-  screenwrite(0,0,DISPLAYON,UPPERSCREEN); //00001111 00001111        //Enables cursor and blinking on top rows
+  screenwrite(0,0,DISPLAYON,UPPERSCREEN);    
   Delay(10);
-  screenwrite(0,0,CLEARSCREEN,UPPERSCREEN); //00001000 00000001 //Clears top rows
+  screenwrite(0,0,CLEARSCREEN,UPPERSCREEN);  
   Delay(10);
   
-  screenwrite(0,0,FUNCTIONSET,LOWERSCREEN);                            //Turns on screen bottom rows
+  screenwrite(0,0,FUNCTIONSET,LOWERSCREEN);
   Delay(10);
-  screenwrite(0,0,DISPLAYON,LOWERSCREEN);                            //Enables cursor and blinking on bottom rows
+  screenwrite(0,0,DISPLAYON,LOWERSCREEN);
   Delay(10);
-  screenwrite(0,0,CLEARSCREEN,LOWERSCREEN);                     //Clears bottom rows
+  screenwrite(0,0,CLEARSCREEN,LOWERSCREEN);
   Delay(10);
   
 }
@@ -157,7 +159,9 @@ void screenwrite (uint8_t rs,uint8_t rw,uint8_t data, uint8_t screen){
  
   screenmodewrite();
   
-  //Set rs to 1 and rw to 0
+  //Set rs to 1 and rw to 0 to write text to the screen
+  //Set rs to 0 and rw to 0 to change modes and command the screen
+  //screenwrite(1,0,"Text",xxxxxSCREEN);
   if (rs){
     GPIO_SetBits(GPIOA,GPIO_Pin_7);
   }
@@ -174,8 +178,8 @@ void screenwrite (uint8_t rs,uint8_t rw,uint8_t data, uint8_t screen){
   Delay(1000);
   
   //Upper Lower Write Select 
-  //Screen 1 = Upper 
-  //Screen 0 = Lower
+  //Screen 1 = UPPERSCREEN 
+  //Screen 0 = LOWERSCREEN
   if (screen){
     GPIO_SetBits(GPIOA,GPIO_Pin_1);
   }
@@ -267,7 +271,7 @@ uint8_t screenread (uint8_t rs, uint8_t rw, uint8_t screen){
   //Configures pins to inputs
   screenmoderead();
   
-  //Set rs to 0 and rw to 1
+  //Set rs to 0 and rw to 1 to read from the screen
   if (rs){
     GPIO_SetBits(GPIOA,GPIO_Pin_7);
   }
@@ -313,7 +317,7 @@ uint8_t screenread (uint8_t rs, uint8_t rw, uint8_t screen){
 }
 
 void screenupdate (){
-  //Screen update
+  
    while (upperupdate){
      //Read busy flag
      uint8_t stat = screenread(0,1,UPPERSCREEN);
@@ -339,6 +343,7 @@ void screenupdate (){
      //}
    }
 }
+
 
 /* Special concat written for 40 character screen. buffer must be 80 characters long */
 char* concat(char* buffer, char* str1, char* str2){

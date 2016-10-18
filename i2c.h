@@ -17,5 +17,6 @@ void I2C_write(I2C_TypeDef* I2Cx, uint8_t data);
 void I2C_stop(I2C_TypeDef* I2Cx);
 uint8_t I2C_read_nack(I2C_TypeDef* I2Cx);
 uint8_t I2C_read_ack(I2C_TypeDef* I2Cx);
+void init_I2C_Timeout();
 
 #endif

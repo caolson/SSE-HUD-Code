@@ -101,3 +101,35 @@ uint8_t I2C_read_ack(I2C_TypeDef* I2Cx){
 	uint8_t data = I2C_ReceiveData(I2Cx);
 	return data;
 }
+
+void init_I2C_Timeout() {
+
+  NVIC_InitTypeDef      NVIC_InitStructure;
+  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+  
+  /* TIM5 clock enable */
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);
+  
+  /* Compute the prescaler value */
+  uint16_t PrescalerValue = (uint16_t) 71; //Standard Clock Divider of 71 Results in 1 MHz clock
+  
+  /* Time base configuration */
+  TIM_TimeBaseStructure.TIM_Period = 1500; //CHANGE ME TO CHANGE I2C TIMEOUT. 750 IS OK, BUT KINDA SLOW
+  TIM_TimeBaseStructure.TIM_Prescaler = PrescalerValue;
+  TIM_TimeBaseStructure.TIM_ClockDivision = 0;
+  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+  
+  TIM_TimeBaseInit(TIM5, &TIM_TimeBaseStructure);
+  
+  TIM_ITConfig(TIM5, TIM_IT_Update, ENABLE);
+  
+  NVIC_InitStructure.NVIC_IRQChannel = TIM5_IRQn ;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure); 
+  
+  /* TIM5 enable counter */
+  TIM_Cmd(TIM5, DISABLE);
+  TIM5->CNT = 0;
+}
