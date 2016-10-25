@@ -1,42 +1,46 @@
-"C:\Users\vaugh_000\Documents\GitHub\Utilities\STM32F4-Discovery\stm32f4_discovery_lis302dl.c"
+"C:\Users\vaugh_000\Documents\GitHub\SSE-HUD-Code\STM32F4-Discovery_FW_V1.1.0\Utilities\STM32F4-Discovery\stm32f4_discovery_lis302dl.c"
 -std=c99
 -ferror-limit=100
 -I
-C:\Users\Carl\Documents\HUD Code
+C:\Users\vaugh_000\Documents\GitHub\SSE-HUD-Code\STM32F4-Discovery_FW_V1.1.0\Utilities
 -I
-C:\Users\Carl\Documents\HUD Code\Utilities
+C:\Users\vaugh_000\Documents\GitHub\SSE-HUD-Code\STM32F4-Discovery_FW_V1.1.0\Libraries
 -I
-C:\Users\Carl\Documents\HUD Code\Libraries
+C:\Users\vaugh_000\Documents\GitHub\SSE-HUD-Code\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc
 -I
-C:\Users\Carl\Documents\HUD Code\Libraries\STM32F4xx_StdPeriph_Driver\inc
+C:\Users\vaugh_000\Documents\GitHub\SSE-HUD-Code\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include
 -I
-C:\Users\Carl\Documents\HUD Code\Libraries\CMSIS\Include
+C:\Users\vaugh_000\Documents\GitHub\SSE-HUD-Code\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\ST\STM32F4xx\Include
 -I
-C:\Users\Carl\Documents\HUD Code\Libraries\CMSIS\ST\STM32F4xx\Include
+C:\Users\vaugh_000\Documents\GitHub\SSE-HUD-Code\STM32F4-Discovery_FW_V1.1.0\Utilities\STM32F4-Discovery
 -I
-C:\Users\Carl\Documents\HUD Code\Utilities\STM32F4-Discovery
+C:\Users\vaugh_000\Documents\GitHub\SSE-HUD-Code\STM32F4-Discovery_FW_V1.1.0\Project
 -I
-C:\Users\Carl\Documents\HUD Code\Project
+C:\Users\vaugh_000\Documents\GitHub\SSE-HUD-Code
+-I
+C:\Users\vaugh_000\Documents\GitHub\SSE-HUD-Code\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\src
 -I
 D:\School Programs\arm\inc
 -I
 D:\School Programs\arm\inc\c
 -I
-C:\Users\Carl\Documents\HUD Code
+C:\Users\vaugh_000\Documents\GitHub\SSE-HUD-Code\STM32F4-Discovery_FW_V1.1.0\Utilities
 -I
-C:\Users\Carl\Documents\HUD Code\Utilities
+C:\Users\vaugh_000\Documents\GitHub\SSE-HUD-Code\STM32F4-Discovery_FW_V1.1.0\Libraries
 -I
-C:\Users\Carl\Documents\HUD Code\Libraries
+C:\Users\vaugh_000\Documents\GitHub\SSE-HUD-Code\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc
 -I
-C:\Users\Carl\Documents\HUD Code\Libraries\STM32F4xx_StdPeriph_Driver\inc
+C:\Users\vaugh_000\Documents\GitHub\SSE-HUD-Code\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include
 -I
-C:\Users\Carl\Documents\HUD Code\Libraries\CMSIS\Include
+C:\Users\vaugh_000\Documents\GitHub\SSE-HUD-Code\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\ST\STM32F4xx\Include
 -I
-C:\Users\Carl\Documents\HUD Code\Libraries\CMSIS\ST\STM32F4xx\Include
+C:\Users\vaugh_000\Documents\GitHub\SSE-HUD-Code\STM32F4-Discovery_FW_V1.1.0\Utilities\STM32F4-Discovery
 -I
-C:\Users\Carl\Documents\HUD Code\Utilities\STM32F4-Discovery
+C:\Users\vaugh_000\Documents\GitHub\SSE-HUD-Code\STM32F4-Discovery_FW_V1.1.0\Project
 -I
-C:\Users\Carl\Documents\HUD Code\Project
+C:\Users\vaugh_000\Documents\GitHub\SSE-HUD-Code
+-I
+C:\Users\vaugh_000\Documents\GitHub\SSE-HUD-Code\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\src
 -DSTM32f4XX=1
 -DUSE_STDPERIPH_DRIVER=1
 -D__CHAR_BITS__=8

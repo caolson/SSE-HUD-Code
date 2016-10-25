@@ -29,10 +29,9 @@ Extra_2 (I2C)           PB11
 #define IC 1
 #define BLDC 2
 #define PLAN_C 3
-
 #define I2CDELAY 200  //Dont set below 100
-
 #define I2C_UPDATE_MAX_SPEED 1 //Each tick is approximately 0.6 ms, so 200 is approximately 100 ms
+
 volatile  float speedMPH = 0;
 volatile uint32_t count = 0;
 float smallAverage = 0;
@@ -214,7 +213,7 @@ int main(void){
 
   uint8_t MotorType = 0;
   uint8_t MotorConfirm = 0;
-  uint8_t BlinkCounter = 0;
+  uint32_t BlinkCounter = 0;
     
   TIM_OCInitTypeDef TIM_OCStruct;
 
