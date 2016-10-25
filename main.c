@@ -194,18 +194,21 @@ int main(void){
   uint16_t threshold = 10;      //Debounce threshold
   uint32_t count = 0;           //Debounce Counter
   
-  //Currently 7 bits of 0 + motor enable
-  uint8_t enable = 0;           //Debounce motor enable
-  
-  uint8_t status = 0;           //Status byte. LSb is enable
-  
   uint8_t brake = 0;
+  
+  // Currently Unused variables
   
   //Bit 0 = echo enable
   //Bit 1 = fault pin
   //Bits 2-7 = 0
   uint8_t mcspeed = 0;          //Motor controller speed in rev/s
   uint8_t mcstatus = 0;         //Motor controller status
+  uint8_t status = 0;           //Status byte. LSb is enable
+  
+  //Currently 7 bits of 0 + motor enable
+  uint8_t enable = 0;           //Debounce motor enable
+  
+  
   
   uint16_t updatecount = 0;
   
@@ -217,12 +220,12 @@ int main(void){
     
   TIM_OCInitTypeDef TIM_OCStruct;
 
-   //Busy LEDs
+  //Busy LEDs
   STM_EVAL_LEDInit(LED4);
   STM_EVAL_LEDOn(LED4);
   STM_EVAL_LEDInit(LED5);
  
-  Delay(0xFFFFF); //Gives the screen time to wake up before we initialize it
+  Delay(0xFFFFF);               //Gives the screen time to wake up before we initialize it
   STM_EVAL_LEDOn(LED5);
   STM_EVAL_LEDOff(LED4); 
   
@@ -231,10 +234,11 @@ int main(void){
   init_Throttle();              //Initialize Throttle
   init_screen();                //Initialize Screen
   init_tach();                  //Initialize Tachometer
-  //init_brakes();                //Initialize Brake detection
   init_watchdog();              //Initialize Watchdog
-  //init_I2C_Timeout();         //TODO: come back
   init_ElapsedTime();
+  //init_I2C_Timeout();         //TODO: come back
+  //init_brakes();              //Initialize Brake detection
+  
   
   // PWM init to 0
   TIM4->CCR1 = 0;
