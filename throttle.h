@@ -14,6 +14,6 @@ void TM_TIMER_Init(void);
 
 void TM_PWM_Init(void);
 
-void updateThrottle(uint8_t enable, uint8_t brake);
+void updateThrottle(uint8_t enable);
 
 #endif

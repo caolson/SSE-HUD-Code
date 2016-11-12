@@ -30,6 +30,7 @@ uint8_t lowerloc = 0;
 uint8_t upperend = 0;
 uint8_t lowerend = 0;
 
+//DON'T CHANGE THIS
 //The Char map bits are flipped on the datasheet
 //Ascii table with correct corresponding characters
 uint8_t charmap[256] = { 

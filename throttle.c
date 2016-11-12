@@ -3,7 +3,7 @@
 #include "throttle.h"
 
 
-volatile uint8_t currentThrottle = 0;
+  volatile uint8_t currentThrottle = 0;
 
   uint8_t i;
   uint8_t throtave[50] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // *Make every element 0* 
@@ -49,23 +49,23 @@ int POTGetValue(void){                  //Used to get int value of Throttle
 }
  
 void TM_TIMER_Init(void) {
-    TIM_TimeBaseInitTypeDef TIM_BaseStruct;
+  TIM_TimeBaseInitTypeDef TIM_BaseStruct;
     
     /* Enable clock for TIM4 */
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);  
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);  
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB,ENABLE);
   
-    GPIO_InitTypeDef  GPIO_InitStruct;
+  GPIO_InitTypeDef  GPIO_InitStruct;
     
-    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;           // I2C will use PB6 for Plan C PWM
-    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;			// set pins to alternate function
-    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_2MHz;		// set GPIO speed
-    GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;			// set output to open drain --> the line has to be only pulled low, not driven high
-    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;		// enable pull up resistors
-    GPIO_Init(GPIOB, &GPIO_InitStruct);			        // init GPIOB
+  GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;           // I2C will use PB6 for Plan C PWM
+  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;			// set pins to alternate function
+  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_2MHz;		// set GPIO speed
+  GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;			// set output to open drain --> the line has to be only pulled low, not driven high
+  GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;		// enable pull up resistors
+  GPIO_Init(GPIOB, &GPIO_InitStruct);			        // init GPIOB
   
      
-    GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_TIM4);
+  GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_TIM4);
   //  GPIOB->AFR[GPIO_PinSource6 >> 0x03] = 0x02;
     
 /*    
@@ -114,9 +114,8 @@ void TM_TIMER_Init(void) {
     TIM_TimeBaseInit(TIM4, &TIM_BaseStruct);
     /* Start count on TIM4 */
     
-      GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_TIM4);
-      
-      
+    GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_TIM4);
+          
     TIM_Cmd(TIM4, ENABLE);
 }
 
@@ -151,14 +150,12 @@ void TM_PWM_Init(void) {
 
 }
 
-void updateThrottle(uint8_t enable, uint8_t brake) {
-    //Read Throttle value // ADD LOW PASS FILTER AND RAMPING
-  //Read Break press Boolean
+void updateThrottle(uint8_t enable) {            //TODO: Brake input why?
+  //Read Throttle value // ADD LOW PASS FILTER AND RAMPING
   //Sets throttle to zero if the brake is pressed.
   
    throttle = POTGetValue();                                    //Normalize to 0-100
-   brake = GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_3);
-   if (!enable || brake) { 
+   if (!enable) { 
       throttle = 0;                                             //Do not send a value if motor is disabled 
    } else{
     if (throttle > 4000) { throttle = 4000; }

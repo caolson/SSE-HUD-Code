@@ -2286,10 +2286,10 @@
   <group>
     <name>user</name>
     <file>
-      <name>$PROJ_DIR$\brake.c</name>
+      <name>$PROJ_DIR$\elapsed.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\brake.h</name>
+      <name>$PROJ_DIR$\elapsed.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\i2c.c</name>
@@ -2329,6 +2329,12 @@
     </file>
     <file>
       <name>$PROJ_DIR$\throttle.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\watchdog.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\watchdog.h</name>
     </file>
   </group>
   <file>

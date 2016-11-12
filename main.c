@@ -1,14 +1,10 @@
 #include "main.h"
 
-/*------------------------
-Architecture changes
-->Init
-->Read switches
-->Confirm on screen
-->Driver input to confirm
-->while(1)
-Done as of 10/15/2016
----------------------------*/
+//TODO: change all of the brake code to read the engine RPM this will affect brake.c and .h as 
+// well as throttle.c and then there will need to be a function and a screen output for the engine rpm 
+// figure out what kind of signal is coming from the the engine that will be giving us the RPM
+// this will be on PA3
+
 /*--------------------------
 Pinout:
 BLDC                    PC15
@@ -26,76 +22,16 @@ Extra_1 (I2C)           PB10
 Extra_2 (I2C)           PB11
 --------------------------*/
 
-#define IC 1
-#define BLDC 2
-#define PLAN_C 3
-#define I2CDELAY 200  //Dont set below 100
-#define I2C_UPDATE_MAX_SPEED 1 //Each tick is approximately 0.6 ms, so 200 is approximately 100 ms
-
 volatile  float speedMPH = 0;
-volatile uint32_t count = 0;
-float smallAverage = 0;
-float averageSpeed = 0;
-int nSmall = 0;
-int nAverage = 0;
+volatile uint32_t count = 0;  //Deboune counter
 
+//TODO: where is this being used and then move it there
 uint16_t i2cCounter = 0;
 uint8_t oldThrottle = 101; //Some value the throttle can never be. 
-
 extern volatile uint8_t I2CTimedOut = 0;
 extern volatile uint32_t revolutions;
 
-char* itos(char str[11], uint32_t value);
-char* insertString(char* buffer, char* str, uint8_t pos); 
-
-extern volatile uint32_t elapsed = 0;
-
-void init_ElapsedTime() { // used by the screen
-
-  NVIC_InitTypeDef      NVIC_InitStructure;
-  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-  
-  /* TIM3 clock enable */
-  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
-  
-  /* Compute the prescaler value */
-  uint16_t PrescalerValue = (uint16_t) 2666; //Standard Clock Divider of 71 Results in 1 MHz clock
-  
-  /* Time base configuration */
-  TIM_TimeBaseStructure.TIM_Period = 10000;
-  TIM_TimeBaseStructure.TIM_Prescaler = PrescalerValue;
-  TIM_TimeBaseStructure.TIM_ClockDivision = 0;
-  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-  
-  TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
-  
-  TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
-  
-  NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn ;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure); 
-  
-  /* TIM3 enable counter */
-  TIM_Cmd(TIM3, ENABLE);
-} 
-
-void TIM3_IRQHandler(void) { // used by the screen
-  TIM_ClearFlag(TIM3, TIM_FLAG_Update);
-  elapsed++;
-}
-
-void init_watchdog() {
-  IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
-  uint32_t lsiFreq = 32000; //GetLSIFrequency();
-  IWDG_SetPrescaler(IWDG_Prescaler_32);
-  IWDG_SetReload(lsiFreq/32); //Magic Constant for 1 sec
-  IWDG_ReloadCounter();
-  IWDG_Enable();
-}
-
-void init_InputGPIO(void){
+void init_InputGPIO(void){ //Clean up what this is called and what pins are doing what To avoid double initialization of pins
   /* Configure pin to be Input 
   GPIO_InitStruct.GPIO_Pin = GPIO_Pin_x;
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
@@ -115,7 +51,7 @@ void init_InputGPIO(void){
   //Initialze GPIO Structure
   GPIO_InitTypeDef  GPIO_InitStruct;
   
-//GPIOA pin PC2 - Motor Enable
+ //GPIOA pin PC2 - Motor Enable
   GPIO_InitStruct.GPIO_Pin = GPIO_Pin_2;
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
@@ -190,56 +126,55 @@ void init_InputGPIO(void){
 }
 
 int main(void){
+  
+  
+  float smallAverage = 0;
+  float averageSpeed = 0;
+  int nSmall = 0;                 //Change size
+  int nAverage = 0;
+  
   uint8_t MotorEnabled = 0x00;  //Is motor enabled pressed?
   uint16_t threshold = 10;      //Debounce threshold
   uint32_t count = 0;           //Debounce Counter
-  
-  uint8_t brake = 0;
-  
-  // Currently Unused variables
+  uint8_t enable = 0;           //LSb is if the motor is enabled or not
+  uint16_t updatecount = 0;
+  uint8_t LEDCount = 0;
+  uint8_t MotorType = 0;
+  uint8_t MotorConfirm = 0;
+  uint32_t BlinkCounter = 0;
+  uint32_t elapsed = 0;
+    
+ 
+ // TODO: move all of the unused things to a more managable place
   
   //Bit 0 = echo enable
   //Bit 1 = fault pin
   //Bits 2-7 = 0
   uint8_t mcspeed = 0;          //Motor controller speed in rev/s
-  uint8_t mcstatus = 0;         //Motor controller status
-  uint8_t status = 0;           //Status byte. LSb is enable
+  //uint8_t mcstatus = 0;         //Motor controller status
   
-  //Currently 7 bits of 0 + motor enable
-  uint8_t enable = 0;           //Debounce motor enable
-  
-  
-  
-  uint16_t updatecount = 0;
-  
-  uint8_t LEDCount = 0;
-
-  uint8_t MotorType = 0;
-  uint8_t MotorConfirm = 0;
-  uint32_t BlinkCounter = 0;
-    
+  //uint8_t status = 0;           //Status byte. LSb is enable
+ 
   TIM_OCInitTypeDef TIM_OCStruct;
 
   //Busy LEDs
   STM_EVAL_LEDInit(LED4);
-  STM_EVAL_LEDOn(LED4);
   STM_EVAL_LEDInit(LED5);
- 
-  Delay(0xFFFFF);               //Gives the screen time to wake up before we initialize it
   STM_EVAL_LEDOn(LED5);
-  STM_EVAL_LEDOff(LED4); 
+  STM_EVAL_LEDOff(LED4);
   
-  
+  Delay(0xFFFFF);               //Gives the screen time to wake up before we initialize it
+   
   init_InputGPIO();             //Initialize Inputs: Motor Enable, Tach, Brake Lights
   init_Throttle();              //Initialize Throttle
   init_screen();                //Initialize Screen
   init_tach();                  //Initialize Tachometer
   init_watchdog();              //Initialize Watchdog
   init_ElapsedTime();
+ 
   //init_I2C_Timeout();         //TODO: come back
-  //init_brakes();              //Initialize Brake detection
   
-  
+  //TODO: make this readable
   // PWM init to 0
   TIM4->CCR1 = 0;
   TIM4->CNT = 0x0;
@@ -257,7 +192,7 @@ int main(void){
   }
   else{
     MotorType = 0;
-    stringtoscreen("STOP A BAD THING HAS HAPPENED!!!", UPPERSCREEN); //TODO: COME BACK FOR ME!!!
+    stringtoscreen("STOP A BAD THING HAS HAPPENED!!!", UPPERSCREEN); 
     while(1){}
   }
   
@@ -292,7 +227,7 @@ int main(void){
   if (MotorType == BLDC) {
     init_I2C1();                //Initialize I2C
     
-    TIM_OCStruct.TIM_OCMode = TIM_OCMode_PWM2;
+    TIM_OCStruct.TIM_OCMode = TIM_OCMode_PWM2;                  //TODO: wtf
     TIM_OCStruct.TIM_OutputState = TIM_OutputState_Enable;
     TIM_OCStruct.TIM_OCPolarity = TIM_OCPolarity_Low;
   }
@@ -301,11 +236,13 @@ int main(void){
     TM_PWM_Init();
   }
     
-  TIM4->CCR1 = 0;
+  TIM4->CCR1 = 0;                    //TODO: make me readable
   TIM4->CNT = 0xff;
   
   while (1){
     
+    //This is for a visual indication that the STM is running properly
+    //LED4 and 5 should blick back and forth at a consistant interval
     LEDCount++;
     if(LEDCount > 250) {
       STM_EVAL_LEDToggle(LED4);
@@ -313,7 +250,7 @@ int main(void){
       LEDCount=0;
     }
     
-    MotorEnabled = (GPIOA->IDR>>0x00)&0x01;
+    MotorEnabled = (GPIOA->IDR>>0x00)&0x01;             //TODO: change me
     //Motor enable/disabled and debouncing
     if (MotorEnabled){           
       count++;
@@ -330,7 +267,9 @@ int main(void){
       enable = 0;
     }
     
-    updateThrottle(enable, brake);
+    updateThrottle(enable);
+    
+    //TODO: package this differently maybe put this into the screen file
     
     
     if (updatecount == (PLAN_C ? 50 : 200)) {                  //Update times for Plan_C or I2C
@@ -343,13 +282,22 @@ int main(void){
       
       char buf[11];
       
+      /*
+      xxNABLED                 Distance
+      MCSPEED                         xxx.xxx
+      Speed Ave   Throttle     Elapsed, s
+      xx    xx    xx           xx:xx
+      */
+      
+      //TODO: change it to have it be that str1 is the top line and so on
+      
       insertString(str1, "Speed", 0);                      //Unconcatenated strings
       insertString(str1, "Ave", 6);   
       insertString(str1, "Throttle",12);     
       insertString(str1, "Elapsed, s", 25);
       
-      insertString(str2, itos(buf, speedMPH), 0);
-      insertString(str2, itos(buf, averageSpeed), 6);
+      insertString(str2, itos(buf, (uint32_t) speedMPH), 0);
+      insertString(str2, itos(buf, (uint32_t) averageSpeed), 6);
       insertString(str2, itos(buf, currentThrottle), 12);
       insertString(str2, itos(buf, elapsed), 25);
       concat(strl, str1, str2);        
@@ -357,7 +305,9 @@ int main(void){
       insertString(str3, enable ? "ENABLED" : "DISABLED",0);
       insertString(str3, "Distance, ft", 25);
       
-      insertString(str4, itos(buf, revolutions*(TIRE_DIAMETER*3.1415)/12), 25);
+      insertString(str4, "MCSPEED", 0);
+      insertString(str4, itos(buf, mcspeed), 12);
+      insertString(str4, itos(buf, (uint32_t) (revolutions*(TIRE_DIAMETER*3.1415)/12)), 25);
       concat(stru, str3, str4);
                                
       stringtoscreen(strl, LOWERSCREEN);                           //Printing to screen
@@ -365,10 +315,10 @@ int main(void){
       updatecount = 0;                                             //Reset update time
     }
     updatecount++;
-    
-    
+        
     //Tach
     //Perform a two layer average
+    //TODO: this is dumb
     if(nSmall<100){
       nSmall++;
       smallAverage = (speedMPH + nSmall*smallAverage)/(nSmall+1);
@@ -379,19 +329,19 @@ int main(void){
       smallAverage = 0;
     }
     
-    //Calculation for throttle output using tach
-    
     screenupdate();
     
     //Watchdog feeding
     IWDG_ReloadCounter();
     
-    //Update status byte
-    status = enable<<0;
+    //Update status byte        //TODO: what is that
+    //status = enable<<0;
     
-    
-    
-    if(!PLAN_C) {
+    if(!PLAN_C) { //TODO: check if it is in bldc mode
+      
+      //TODO: I2C timeout actually working?
+      //TODO: describe what is going on in the I2C interation and have better comments
+      //TODO: take out all of the shit 
       
       //TIM_Cmd(TIM5, ENABLE); //Start timeout counter
       //I2CTimedOut = 0;
@@ -400,6 +350,7 @@ int main(void){
       I2C_start(I2C1, SLAVE_ADDRESS<<1, I2C_Direction_Transmitter); // start a transmission in Master transmitter mode
       
       I2C_write(I2C1, 0x01);
+      
       //Send the speed
       I2C_write(I2C1, currentThrottle);
       I2C_stop(I2C1);
@@ -422,7 +373,7 @@ int main(void){
       //TIM_Cmd(TIM5, DISABLE);
       //TIM5->CNT = 0; //Stop and Reset timeout counter
       
-    }else { //PLAN C - just modify the PWM duty cycle
+    }else { //PLAN C - just modify the PWM duty cycle  //TODO: comment this.
       TIM4->CCR1 = ((8399 + 1) * currentThrottle) / 100; //Pulse Length
     }
     Delay(0x15F);
@@ -430,11 +381,14 @@ int main(void){
   }
 }
 
-void Delay(__IO uint32_t nCount){
+void Delay(__IO uint32_t nCount){ //maybe make this a real delay loop?
   while(nCount--)
   {
   }
 }
+
+
+//TODO: move this into screen.c and .h
 
 char* itos(char str[11], uint32_t value) {
 
@@ -460,5 +414,4 @@ char* insertString(char* buffer, char* str, uint8_t pos) {
 
 	buffer[39] = 0; //Ensure the final string is null terminated
 	return buffer;
-
 }

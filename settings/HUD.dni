@@ -24,7 +24,7 @@ Freq=10000000
 MultiCoreRunAll=1
 [StLinkDriver]
 CStepIntDis=_ 0
-stlinkserialNo=2798FD0D
+stlinkserialNo=6A710FAB
 stlinkfoundProbes=
 [Exceptions]
 StopOnUncaught=_ 0
@@ -47,7 +47,7 @@ ITMportsTermIO=0
 ITMportsLogFile=0
 ITMlogFile=$PROJ_DIR$\ITM.log
 [DebugChecksum]
-Checksum=1429942935
+Checksum=-240154427
 [CodeCoverage]
 Enabled=_ 0
 [CallStack]
