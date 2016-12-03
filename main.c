@@ -1,6 +1,6 @@
 #include "main.h"
 
-//TODO: change all of the brake code to read the engine RPM this will affect brake.c and .h as 
+//TODO: change all of the brake code to read the engine hall this will affect brake.c and .h as 
 // well as throttle.c and then there will need to be a function and a screen output for the engine rpm 
 // figure out what kind of signal is coming from the the engine that will be giving us the RPM
 // this will be on PA3
@@ -13,7 +13,7 @@ IC                      PE5
 I2C Data (throttle)     PB7
 I2C Clock (throttle)    PB6
 Tach                    PB1
-Engine RPM              PA3
+Engine Hall             PA3
 Throttle                PB0
 Motor Enable            PC2
 Confirmation Button     PC7
@@ -152,9 +152,7 @@ int main(void){
   //Bits 2-7 = 0
   uint8_t mcspeed = 0;          //Motor controller speed in rev/s
   //uint8_t mcstatus = 0;         //Motor controller status
-  
-  //uint8_t status = 0;           //Status byte. LSb is enable
- 
+   
   TIM_OCInitTypeDef TIM_OCStruct;
 
   //Busy LEDs
@@ -282,34 +280,33 @@ int main(void){
       
       char buf[11];
       
-      /*
-      xxNABLED                 Distance
-      MCSPEED                         xxx.xxx
-      Speed Ave   Throttle     Elapsed, s
-      xx    xx    xx           xx:xx
-      */
+                  //SCREEN OUTPUT
+      /*-------------------------------------\ 
+      |xxNABLED                 Distance     |
+      |MCSPEED                         xxx.xx|
+      |Speed Ave   Throttle     Elapsed, s   |
+      |xx    xx    xx           xx:xx        |
+      \-------------------------------------*/
       
-      //TODO: change it to have it be that str1 is the top line and so on
+      insertString(str1, enable ? "ENABLED" : "DISABLED",0);
+      insertString(str1, "Distance, ft", 25);
       
-      insertString(str1, "Speed", 0);                      //Unconcatenated strings
-      insertString(str1, "Ave", 6);   
-      insertString(str1, "Throttle",12);     
-      insertString(str1, "Elapsed, s", 25);
+      insertString(str2, "MCSPEED", 0);
+      insertString(str2, itos(buf, mcspeed), 12);
+      insertString(str2, itos(buf, (uint32_t) (revolutions*(TIRE_DIAMETER*3.1415)/12)), 25);
+      concat(stru, str1, str2);
+
+      insertString(str3, "Speed", 0);                      //Unconcatenated strings
+      insertString(str3, "Ave", 6);   
+      insertString(str3, "Throttle",12);     
+      insertString(str3, "Elapsed, s", 25);
       
-      insertString(str2, itos(buf, (uint32_t) speedMPH), 0);
-      insertString(str2, itos(buf, (uint32_t) averageSpeed), 6);
-      insertString(str2, itos(buf, currentThrottle), 12);
-      insertString(str2, itos(buf, elapsed), 25);
-      concat(strl, str1, str2);        
+      insertString(str4, itos(buf, (uint32_t) speedMPH), 0);
+      insertString(str4, itos(buf, (uint32_t) averageSpeed), 6);
+      insertString(str4, itos(buf, currentThrottle), 12);
+      insertString(str4, itos(buf, elapsed), 25);
+      concat(strl, str3, str3);
       
-      insertString(str3, enable ? "ENABLED" : "DISABLED",0);
-      insertString(str3, "Distance, ft", 25);
-      
-      insertString(str4, "MCSPEED", 0);
-      insertString(str4, itos(buf, mcspeed), 12);
-      insertString(str4, itos(buf, (uint32_t) (revolutions*(TIRE_DIAMETER*3.1415)/12)), 25);
-      concat(stru, str3, str4);
-                               
       stringtoscreen(strl, LOWERSCREEN);                           //Printing to screen
       stringtoscreen(stru, UPPERSCREEN);
       updatecount = 0;                                             //Reset update time
@@ -337,7 +334,7 @@ int main(void){
     //Update status byte        //TODO: what is that
     //status = enable<<0;
     
-    if(!PLAN_C) { //TODO: check if it is in bldc mode
+    if(BLDC) { //TODO: clean me... this is so bad
       
       //TODO: I2C timeout actually working?
       //TODO: describe what is going on in the I2C interation and have better comments
@@ -405,13 +402,13 @@ char* itos(char str[11], uint32_t value) {
 */
 char* insertString(char* buffer, char* str, uint8_t pos) {
 	
-	uint8_t len = 0, i = 0;
-	while(str[len] != 0) { len++; } //Find the length of the string
+  uint8_t len = 0, i = 0;
+  while(str[len] != 0) { len++; } //Find the length of the string
 
-	for (i = 0; i < (len) && (pos+i) < 39; i++) { //Copy everything but the null terminator, or until we hit the end of the buffer
-		buffer[pos+i] = str[i];
-	}
+  for (i = 0; i < (len) && (pos+i) < 39; i++) { //Copy everything but the null terminator, or until we hit the end of the buffer
+    buffer[pos+i] = str[i];
+  }
 
-	buffer[39] = 0; //Ensure the final string is null terminated
-	return buffer;
+  buffer[39] = 0; //Ensure the final string is null terminated
+  return buffer;
 }
