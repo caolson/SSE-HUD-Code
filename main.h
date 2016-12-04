@@ -16,11 +16,10 @@
 
 #include "screen.h"
 #include "tach.h"
-#include "Elapsed.h"
 #include "throttle.h"  
 #include "watchdog.h" 
 #include "i2c.h"
-
+#include "elapsed.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -40,8 +39,10 @@
 #define TACH_TIMER_FREQUENCY    375000
 
 /*----------Global Variable Definitions----------*/
-extern volatile float speedMPH;
-extern volatile uint32_t count;
+extern volatile float speedMPH;         //Throttle
+extern volatile uint32_t count;         //TODO: don't know
+extern volatile uint32_t seconds;       //Elapsed
+
 
 /*--------------Useful Functions-----------------*/
 void Delay(__IO uint32_t nCount);

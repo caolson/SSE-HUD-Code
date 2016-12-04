@@ -47,13 +47,16 @@ ITMportsTermIO=0
 ITMportsLogFile=0
 ITMlogFile=$PROJ_DIR$\ITM.log
 [DebugChecksum]
-Checksum=-240154427
+Checksum=1391891631
 [CodeCoverage]
 Enabled=_ 0
 [CallStack]
 ShowArgs=0
 [Disassembly]
 MixedMode=1
+[watch_formats]
+Fmt0={W}1:BlinkCounter	3	0
+Fmt1={W}1:MotorType	3	0
 [Trace2]
 Enabled=0
 ShowSource=0
@@ -107,16 +110,16 @@ Exclusions=
 Enabled=0
 [CallStackStripe]
 ShowTiming=1
-[Log file]
-LoggingEnabled=_ 0
-LogFile=_ ""
-Category=_ 0
 [Disassemble mode]
 mode=0
 [Breakpoints2]
 Bp0=_ 1 "EMUL_CODE" "{$PROJ_DIR$\stm32f4xx_it.c}.67.3" 0 0 1 "" 0 "" 0
 Bp1=_ 1 "EMUL_CODE" "{$PROJ_DIR$\stm32f4xx_it.c}.158.3" 0 0 1 "" 0 "" 0
 Count=2
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
 [Aliases]
 Count=0
 SuppressDialog=0

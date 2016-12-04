@@ -17,6 +17,7 @@ void init_Throttle(void){
   // Enable ADC clock
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
+
   //Initialze GPIO and ADC Structure
   GPIO_InitTypeDef  GPIO_InitStruct;
   ADC_InitTypeDef ADC_InitStructure;
@@ -35,6 +36,7 @@ void init_Throttle(void){
   ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
   ADC_InitStructure.ADC_NbrOfConversion = 1;
   ADC_Init(ADC1, &ADC_InitStructure);
+
   //Enable ADC1
   ADC_Cmd(ADC1, ENABLE);
   
