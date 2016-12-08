@@ -5,6 +5,11 @@
 /*----GLOBAL VARIALBES----*/
 volatile uint32_t seconds = 0;
 
+/*--------------------------
+Peripherals:
+TIM3 for one second pulses 
+--------------------------*/
+
 void init_ElapsedTime(void) { // used by the screen //TODO: make this actually one second
 
   NVIC_InitTypeDef      NVIC_InitStructure;

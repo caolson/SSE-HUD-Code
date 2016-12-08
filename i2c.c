@@ -4,6 +4,17 @@
 #include "stm32f4xx_i2c.h"
 #include "stm32f4xx_rcc.h"
 
+
+/*--------------------------
+GPIO Pinout:
+I2C Data (throttle)     PB7
+I2C Clock (throttle)    PB6
+
+Peripherals:
+I2C1 for I2C
+TIM5 for Timeout 
+--------------------------*/
+
 void init_I2C1(void){                   //I2C1 with SCL @ PB6 and SDA @ PB7
   //Initialze GPIO Structure
   GPIO_InitTypeDef  GPIO_InitStruct;

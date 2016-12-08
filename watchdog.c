@@ -2,6 +2,11 @@
 #include "stm32f4_discovery.h" 
 #include "watchdog.h"
 
+/*--------------------------
+Peripherals:
+Watchdog
+--------------------------*/
+
 void init_watchdog() {
   IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
   uint32_t lsiFreq = 32000; //GetLSIFrequency();

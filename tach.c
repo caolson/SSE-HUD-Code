@@ -2,6 +2,14 @@
 #include "stm32f4_discovery.h" 
 #include "tach.h"
 
+/*--------------------------
+GPIO Pinout:
+Tach                    PB1
+
+Peripherals:
+TIM2 for duration reading 
+--------------------------*/
+
 /*------GLOBAL VARIABLES-------*/
 uint16_t PrescalerValue = 0;
 

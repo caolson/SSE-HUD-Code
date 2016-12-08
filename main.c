@@ -16,7 +16,7 @@ I2C Data (throttle)     PB7
 I2C Clock (throttle)    PB6
 Tach                    PB1
 Engine Hall             PA3
-Throttle                PB0
+Throttle Input          PB0
 Motor Enable            PC2
 Confirmation Button     PA13
 Extra_4                 PC3
