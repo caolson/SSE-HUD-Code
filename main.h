@@ -30,19 +30,14 @@
 #define BLDC            2
 #define PLAN_C          3
 
-/*--------------------I2C------------------------*/
-#define I2CDELAY                200  //Dont set below 100
-#define I2C_UPDATE_MAX_SPEED    1 //Each tick is approximately 0.6 ms, so 200 is approximately 100 ms
-
 /*--------------Car Constants--------------------*/
 #define TIRE_DIAMETER           19
-#define TACH_TIMER_FREQUENCY    375000
 
 /*----------Global Variable Definitions----------*/
 extern volatile float speedMPH;         //Throttle
 extern volatile uint32_t count;         //TODO: don't know
 extern volatile uint32_t seconds;       //Elapsed
-
+extern volatile uint32_t revolutions;
 
 /*--------------Useful Functions-----------------*/
 void Delay(__IO uint32_t nCount);

@@ -2,6 +2,7 @@
 #include "stm32f4_discovery.h" 
 #include "tach.h"
 
+/*------GLOBAL VARIABLES-------*/
 uint16_t PrescalerValue = 0;
 
 void init_tach(void) {
@@ -9,9 +10,7 @@ void init_tach(void) {
     GPIO_InitTypeDef GPIO_InitStruct;
     EXTI_InitTypeDef EXTI_InitStruct;
     NVIC_InitTypeDef NVIC_InitStruct;
-    GPIO_InitTypeDef GPIO_InitStructure;        //TODO: wtf
-    NVIC_InitTypeDef NVIC_InitStructure;        //TODO: wtf
-    TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+    TIM_TimeBaseInitTypeDef TIM_TimeBaseStruct;
     
     /* Enable clock for GPIOB */
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
@@ -54,9 +53,6 @@ void init_tach(void) {
     /* Add to NVIC */
     NVIC_Init(&NVIC_InitStruct);
     
-    
-
-
       /* TIM2 clock enable */
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
   
@@ -64,20 +60,20 @@ void init_tach(void) {
     uint16_t PrescalerValue = (uint16_t) 71; //Standard Clock Divider of 71 Results in 1 MHz clock
   
     /* Time base configuration */
-    TIM_TimeBaseStructure.TIM_Period = 1500000;
-    TIM_TimeBaseStructure.TIM_Prescaler = PrescalerValue;
-    TIM_TimeBaseStructure.TIM_ClockDivision = 0;
-    TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+    TIM_TimeBaseStruct.TIM_Period = 1500000;
+    TIM_TimeBaseStruct.TIM_Prescaler = PrescalerValue;
+    TIM_TimeBaseStruct.TIM_ClockDivision = 0;
+    TIM_TimeBaseStruct.TIM_CounterMode = TIM_CounterMode_Up;
   
-    TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
+    TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStruct);
   
     TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
    
-    NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn ;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStructure); 
+    NVIC_InitStruct.NVIC_IRQChannel = TIM2_IRQn ;
+    NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x0F;
+    NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x0F;
+    NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStruct); 
   
     /* TIM2 enable counter */
     TIM_Cmd(TIM2, ENABLE);

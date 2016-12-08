@@ -2,31 +2,31 @@
 #include "stm32f4_discovery.h" 
 #include "screen.h"
 
-/* Screen pin assignment:
-  PA1: ENABLE UPPER
-  PA2: ENABLE LOWER
-  PA6: R/W SIGNAL
-  PA7: R/S SIGNAL
-  PE10: DL0
-  PE11: DL1
-  PE12: DL2
-  PE13: DL3
-  PB12: DH0
-  PB13: DH1
-  PB14: DH2
-  PB15: DH3
-  */
+/*--------------------------
+Screen Pinout:
+ENABLE UPPER            PA1 
+ENABLE LOWER            PA2 
+R/W SIGNAL              PA6 
+R/S SIGNAL              PA7
+DL0                     PE10
+DL1                     PE11 
+DL2                     PE12
+DL3                     PE13
+DH0                     PB12
+DH1                     PB13
+DH2                     PB14
+DH3                     PB15
+--------------------------*/
   
-
+/*----GLOBAL VARIALBES----*/
 uint8_t upperscreen [80];
 uint8_t lowerscreen [80];
-  
+
 uint8_t upperupdate = 0;
 uint8_t lowerupdate = 0;
   
 uint8_t upperloc = 0;
 uint8_t lowerloc = 0;
-  
 uint8_t upperend = 0;
 uint8_t lowerend = 0;
 

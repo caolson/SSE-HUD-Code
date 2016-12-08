@@ -2,7 +2,7 @@
 #include "stm32f4_discovery.h" 
 #include "elapsed.h"
 
-
+/*----GLOBAL VARIALBES----*/
 volatile uint32_t seconds = 0;
 
 void init_ElapsedTime(void) { // used by the screen //TODO: make this actually one second

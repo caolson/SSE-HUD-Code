@@ -1,6 +1,7 @@
 #ifndef SCREEN_INCL
 #define SCREEN_INCL
 
+/*------DEFINE CONSTANTS------*/
 #define UPPERSCREEN 1
 #define LOWERSCREEN 0
 #define CLEARSCREEN 0x08 //Returns home and     clears screen 
@@ -11,22 +12,18 @@
 #define FUNCTIONSET 0xC3 //Sets to 8bit, and two line display
 #define BLANK       "                                                                              "
 
-void screenwrite (uint8_t rs,uint8_t rw,uint8_t data, uint8_t screen);
+/*------GLOBAL VARIABLES-------*/
 
+
+/*-------FUNCTION PROTOTYPES------*/
+void screenwrite (uint8_t rs,uint8_t rw,uint8_t data, uint8_t screen);
 void screenmodewrite ();
-
 void screenmoderead();
-
 void init_screen();
-
 void stringtoscreen (char * str, uint8_t screen);
-
 void screenwrite (uint8_t rs,uint8_t rw,uint8_t data, uint8_t screen);
-
 uint8_t screenread (uint8_t rs, uint8_t rw, uint8_t screen);
-
 void screenupdate();
-
 char* concat(char* buffer, char* str1, char* str2);
 
 #endif

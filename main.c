@@ -1,13 +1,14 @@
 #include "main.h"
 
-
-//TODO: change all of the brake code to read the engine hall this will affect brake.c and .h as 
+// TODO: change all of the brake code to read the engine hall this will affect brake.c and .h as 
 // well as throttle.c and then there will need to be a function and a screen output for the engine rpm 
 // figure out what kind of signal is coming from the the engine that will be giving us the RPM
 // this will be on PA3
 
+// TODO: change all of the places that say global variables in all the .c s to call out the global and domestic variables
+
 /*--------------------------
-Pinout:
+GPIO Pinout:
 BLDC                    PC15
 PLAN_C                  PC13
 IC                      PE5
@@ -23,15 +24,28 @@ Extra_1 (I2C)           PB10
 Extra_2 (I2C)           PB11
 --------------------------*/
 
+/*--------------------------
+Screen Pinout:
+ENABLE UPPER            PA1 
+ENABLE LOWER            PA2 
+R/W SIGNAL              PA6 
+R/S SIGNAL              PA7
+DL0                     PE10
+DL1                     PE11 
+DL2                     PE12
+DL3                     PE13
+DH0                     PB12
+DH1                     PB13
+DH2                     PB14
+DH3                     PB15
+--------------------------*/
+
+/*----GLOBAL VARIALBES----*/
 volatile  float speedMPH = 0;
-volatile uint32_t count = 0;  //Deboune counter
-
-
-//TODO: where is this being used and then move it there
+volatile uint32_t count = 0;  //Debounce counter
+volatile uint8_t I2CTimedOut = 0;
 uint16_t i2cCounter = 0;
 uint8_t oldThrottle = 101; //Some value the throttle can never be. 
-extern volatile uint8_t I2CTimedOut = 0;
-extern volatile uint32_t revolutions;
 
 
 //TODO: Move this into a Pins File
@@ -145,9 +159,6 @@ void init_InputGPIO(void){ //Clean up what this is called and what pins are doin
 
 
 }
-
-
-
 
 int main(void){
   
@@ -297,19 +308,17 @@ int main(void){
       enable = 0;
     }
     
+    //Getting the value from the throttle trigger to send to the screen and then to powertrain
     updateThrottle(enable);
     
-    //TODO: package this differently maybe put this into the screen file
-   
-  
     //seconds, minutes, hours
     if (seconds>=60){
       minutes++;
-      seconds=0;
+      seconds=seconds-60;
     }
     if (minutes>=60){
       hours++;
-      minutes=0;
+      minutes=minutes-60;
     }
     
     
@@ -333,21 +342,22 @@ int main(void){
       |xx    xx    xx           x:xx:xx      |
       \-------------------------------------*/
       
-      //TODO: comment this so that people can add things to the screen
-      
+      //Line one
       insertString(str1, enable ? "ENABLED" : "DISABLED",0);
       insertString(str1, "Distance, ft", 25);
       
+      //Line two
       insertString(str2, "MCSPEED", 0);
       insertString(str2, itos(buf, mcspeed), 12);
-      insertString(str2, itos(buf, (uint32_t) (revolutions*(TIRE_DIAMETER*3.1415)/12)), 25);
-      concat(stru, str1, str2);
-
+      insertString(str2, itos(buf, (uint32_t) (revolutions*(TIRE_DIAMETER*3.1415)/12)), 25); //TODO: make the tach speed work
+      
+      //Line three
       insertString(str3, "Speed", 0);
       insertString(str3, "Ave", 6);   
       insertString(str3, "Throttle",12);     
       insertString(str3, "Elapsed Time", 25);
       
+      //Line four
       insertString(str4, itos(buf, (uint32_t) speedMPH), 0);
       insertString(str4, itos(buf, (uint32_t) averageSpeed), 6);
       insertString(str4, itos(buf, currentThrottle), 12);
@@ -356,10 +366,15 @@ int main(void){
       insertString(str4, itos(buf, minutes), 27);
       insertString(str4, ":", 29);
       insertString(str4, itos(buf, seconds), 30);
+      
+      //Combining lines one and two as well as three and four before pushing to the screen
+      concat(stru, str1, str2);
       concat(strl, str3, str4);
       
+      //Outputs to screen
       stringtoscreen(strl, LOWERSCREEN);                           //Printing to screen
       stringtoscreen(stru, UPPERSCREEN);
+      
       updatecount = 0;                                             //Reset update time
     }
     updatecount++;
@@ -395,7 +410,6 @@ int main(void){
         GPIO_ResetBits(GPIOC,GPIO_Pin_3);
       }
     }
-    
     
     if(MotorType == BLDC) { //TODO: clean me... this is so bad
       

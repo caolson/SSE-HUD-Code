@@ -24,7 +24,7 @@ Freq=10000000
 MultiCoreRunAll=1
 [StLinkDriver]
 CStepIntDis=_ 0
-stlinkserialNo=6A710FAB
+stlinkserialNo=FE1D4B26
 stlinkfoundProbes=
 [Exceptions]
 StopOnUncaught=_ 0
@@ -47,7 +47,7 @@ ITMportsTermIO=0
 ITMportsLogFile=0
 ITMlogFile=$PROJ_DIR$\ITM.log
 [DebugChecksum]
-Checksum=1391891631
+Checksum=586502284
 [CodeCoverage]
 Enabled=_ 0
 [CallStack]
@@ -110,16 +110,16 @@ Exclusions=
 Enabled=0
 [CallStackStripe]
 ShowTiming=1
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
 [Disassemble mode]
 mode=0
 [Breakpoints2]
 Bp0=_ 1 "EMUL_CODE" "{$PROJ_DIR$\stm32f4xx_it.c}.67.3" 0 0 1 "" 0 "" 0
 Bp1=_ 1 "EMUL_CODE" "{$PROJ_DIR$\stm32f4xx_it.c}.158.3" 0 0 1 "" 0 "" 0
 Count=2
-[Log file]
-LoggingEnabled=_ 0
-LogFile=_ ""
-Category=_ 0
 [Aliases]
 Count=0
 SuppressDialog=0

@@ -2,14 +2,12 @@
 #include "stm32f4_discovery.h" 
 #include "throttle.h"
 
-
+  /*----GLOBAL VARIALBES----*/
   volatile uint8_t currentThrottle = 0;
-
   uint8_t i;
   uint8_t throtave[50] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // *Make every element 0* 
   uint8_t ringbufferpos = 0;
   float buffave = 0;
-  uint8_t currentthrottle = 0;
   uint32_t throttle = 0;        //Normalized throttle value
 
 
