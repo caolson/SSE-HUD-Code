@@ -2304,6 +2304,12 @@
       <name>$PROJ_DIR$\main.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\pins.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\pins.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\screen.c</name>
     </file>
     <file>

@@ -12,7 +12,7 @@ I2C Clock (throttle)    PB6
 
 Peripherals:
 I2C1 for I2C
-TIM5 for Timeout 
+TIM5 for I2C Timeout 
 --------------------------*/
 
 void init_I2C1(void){                   //I2C1 with SCL @ PB6 and SDA @ PB7

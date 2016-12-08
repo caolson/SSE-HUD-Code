@@ -30,7 +30,7 @@ void init_tach(void) {
     GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
     GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_1;
-    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN; //TODO: This should probably be a no pull or pull up
+    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN; //TODO: This should probably be a no pull or pull up //TODO: test the TACH! Connor! the tach needs to be tested!
     GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
     GPIO_Init(GPIOB, &GPIO_InitStruct);
     

@@ -40,6 +40,15 @@ DH2                     PB14
 DH3                     PB15
 --------------------------*/
 
+/*------------------------
+Peripherials:
+
+
+
+
+--------------------------*/
+
+
 /*----GLOBAL VARIALBES----*/
 volatile  float speedMPH = 0;
 volatile uint32_t count = 0;  //Debounce counter
